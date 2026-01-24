@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>OTP Verification</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 520px;
+            margin: auto;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 30px 35px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .otp-box {
+            background: #f1f5ff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 6px;
+            color: #2962ff;
+            border: 1px dashed #2962ff;
+            margin-top: 20px;
+        }
+        p {
+            font-size: 15px;
+            color: #555;
+            line-height: 1.7;
+        }
+        .footer {
+            text-align: center;
+            font-size: 13px;
+            color: #888;
+            margin-top: 30px;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-block;
+            background: #2962ff;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo">
+        <!-- Logo optional -->
+        <img src="https://cdn-icons-png.flaticon.com/512/545/545680.png"
+             width="70" alt="Logo" />
+    </div>
+
+    <h2>Xác thực mã OTP</h2>
+
+    <p>Chúng tôi nhận được yêu cầu đặt lại mật khẩu từ email của bạn.</p>
+
+    <p>Vui lòng sử dụng mã OTP bên dưới để xác minh danh tính:</p>
+
+    <div class="otp-box">
+        [[${otp}]]
+    </div>
+
+    <p>Mã OTP có hiệu lực trong vòng <strong>5 phút</strong>.
+        Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email.</p>
+
+    <p style="text-align:center;">
+        <a class="btn">Xác nhận ngay</a>
+    </p>
+
+    <div class="footer">
+        © [[${year}]] Your Company. All rights reserved.
+    </div>
+</div>
+
+</body>
+</html>

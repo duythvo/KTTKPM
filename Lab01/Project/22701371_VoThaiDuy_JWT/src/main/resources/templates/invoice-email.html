@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hóa đơn VietVivu</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f5f7fa; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 30px auto; background: #fff; border-radius: 12px; overflow: hidden; }
+        .header { background: linear-gradient(90deg,#1e90ff,#00bcd4); color: #fff; text-align: center; padding: 20px; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .content { padding: 20px; color: #333; }
+        .details { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        .details td { padding: 8px; border-bottom: 1px solid #eee; }
+        .highlight { font-weight: bold; color: #1e90ff; }
+        .footer { background: #f0f8ff; text-align: center; padding: 15px; font-size: 14px; color: #777; }
+        @media (max-width: 600px) { .container { margin: 10px; } .header h1 { font-size: 20px; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <img src="https://vietvivu.com/logo.png" alt="VietVivu" width="150" style="margin-bottom:10px;">
+        <h1>Xác nhận đặt tour thành công 🌴</h1>
+    </div>
+    <div class="content">
+        <h2>Thông tin đặt tour</h2>
+        <table class="details">
+            <tr><td><b>Mã đặt tour:</b></td><td th:text="${bookingId}"></td></tr>
+            <tr><td><b>Ngày đặt:</b></td><td th:text="${bookingDate}"></td></tr>
+            <tr><td><b>Tên tour:</b></td><td th:text="${tourTitle}"></td></tr>
+            <tr><td><b>Điểm đến:</b></td><td th:text="${tourDestination}"></td></tr>
+            <tr><td><b>Thời lượng:</b></td><td th:text="${tourDuration}"></td></tr>
+            <tr><td><b>Người lớn:</b></td><td th:text="${numAdults} + ' x ' + ${priceAdult} + '₫'"></td></tr>
+            <tr><td><b>Trẻ em:</b></td><td th:text="${numChildren} + ' x ' + ${priceChild} + '₫'"></td></tr>
+            <tr><td><b>Tổng cộng:</b></td><td th:text="${totalPrice} + '₫'"></td></tr>
+            <tr><td><b>Giảm giá:</b></td><td th:text="${discountAmount} + '₫'"></td></tr>
+            <tr><td class="highlight">Số tiền thanh toán:</td><td class="highlight" th:text="${finalAmount} + '₫'"></td></tr>
+            <tr><td><b>Phương thức thanh toán:</b></td><td th:text="${paymentMethod}"></td></tr>
+            <tr><td><b>Trạng thái:</b></td><td th:text="${paymentStatus}"></td></tr>
+            <tr><td><b>Mã giao dịch:</b></td><td th:text="${transactionId}"></td></tr>
+            <tr><td><b>Mã hóa đơn:</b></td><td th:text="${invoiceId}"></td></tr>
+            <tr><td><b>Ngày hóa đơn:</b></td><td th:text="${invoiceDate}"></td></tr>
+        </table>
+        <p><b>Ghi chú:</b> <span th:text="${note != null ? note : 'Không có'}"></span></p>
+        <p>Cảm ơn bạn đã tin tưởng VietVivu. Chúc bạn có chuyến đi tuyệt vời! ❤️</p>
+    </div>
+    <div class="footer">
+        © [[${year}]] VietVivu Travel. Hotline: 1900 8888 68
+    </div>
+</div>
+</body>
+</html>
