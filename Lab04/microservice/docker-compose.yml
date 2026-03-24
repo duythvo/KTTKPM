@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_DB: micro_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+    ports:
+      - "5432:5432"
+    networks:
+      - micro-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d micro_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  register-service:
+    build: ./register-service
+    container_name: register-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8082:8082"
+    networks:
+      - micro-network
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    depends_on:
+      - register-service
+    ports:
+      - "8081:8081"
+    networks:
+      - micro-network
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    depends_on:
+      - auth-service
+      - register-service
+    ports:
+      - "8080:8080"
+    networks:
+      - micro-network
+
+networks:
+  micro-network:
+    driver: bridge

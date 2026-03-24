@@ -1,0 +1,21 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: register-service
+              uri: http://register-service:8082
+              predicates:
+                - Path=/register/**
+            - id: user-api
+              uri: http://register-service:8082
+              predicates:
+                - Path=/users/**
+            - id: auth-service
+              uri: http://auth-service:8081
+              predicates:
+                - Path=/auth/**

@@ -1,0 +1,5 @@
+server:
+  port: 8081
+
+services:
+  user-service-url: http://register-service:8082

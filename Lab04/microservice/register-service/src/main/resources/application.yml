@@ -1,0 +1,12 @@
+server:
+  port: 8082
+
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/micro_db
+    username: admin
+    password: admin123
+
+  jpa:
+    hibernate:
+      ddl-auto: update
