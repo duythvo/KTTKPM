@@ -1,0 +1,94 @@
+# Maven build output
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Go
+*.out
+go.sum
+
+# Java
+.classpath
+.project
+.settings/
+.history
+
+# Gradle
+.gradle/
+build/
+
+# Docker
+docker-compose.override.yml
+
+# Misc
+.gradle
+.DS_Store
+*.log
+*.swp
+*.swo
+*~
+.project
+.classpath
+.c9/
+.history
+
+# Minhchung directories (if they contain temporary files)
+**/Minhchung/
+**/Minhchung.md

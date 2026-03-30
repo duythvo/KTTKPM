@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Service Demo - Gateway + Microservices</title>
+    <style>
+      :root {
+        --bg: #f3efe7;
+        --card: #ffffff;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --accent: #0f766e;
+        --accent-2: #b45309;
+        --danger: #b91c1c;
+        --ok: #166534;
+        --border: #e5e7eb;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+        color: var(--text);
+        background: radial-gradient(circle at 20% 0%, #fff9eb 0%, var(--bg) 40%),
+          linear-gradient(120deg, #f6f6f6 0%, #ece3d2 100%);
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 24px auto;
+        padding: 0 16px 24px;
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        letter-spacing: 0.4px;
+      }
+
+      .subtitle {
+        margin: 0 0 20px;
+        color: var(--muted);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 14px;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 14px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      }
+
+      .card h2 {
+        margin-top: 2px;
+        font-size: 1.05rem;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      input,
+      button {
+        font: inherit;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+      }
+
+      .actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        border: 0;
+        border-radius: 8px;
+        padding: 8px 12px;
+        cursor: pointer;
+        background: var(--accent);
+        color: white;
+        transition: transform 0.12s ease, opacity 0.12s ease;
+      }
+
+      button.secondary {
+        background: var(--accent-2);
+      }
+
+      button.danger {
+        background: var(--danger);
+      }
+
+      button:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+      }
+
+      .list {
+        margin: 8px 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 8px;
+      }
+
+      .item {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .item-info {
+        font-size: 0.92rem;
+      }
+
+      .item-info small {
+        color: var(--muted);
+      }
+
+      .status {
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .status.pending {
+        color: #92400e;
+      }
+
+      .status.paid,
+      .status.shipped {
+        color: var(--ok);
+      }
+
+      .msg {
+        margin-bottom: 12px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        display: none;
+      }
+
+      .msg.success {
+        background: #dcfce7;
+        color: var(--ok);
+        border: 1px solid #86efac;
+      }
+
+      .msg.error {
+        background: #fee2e2;
+        color: var(--danger);
+        border: 1px solid #fca5a5;
+      }
+
+      @media (max-width: 700px) {
+        .item {
+          flex-direction: column;
+          align-items: stretch;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Service-Based Architecture Demo</h1>
+      <p class="subtitle">Gateway (3000) -> Order (3001) -> Payment (3002) -> Shipping (3003)</p>
+
+      <div id="message" class="msg"></div>
+
+      <div class="grid">
+        <section class="card">
+          <h2>1) Tạo Order mới</h2>
+          <div class="row">
+            <input id="customer_name" placeholder="Customer name" />
+            <input id="product" placeholder="Product" />
+            <input id="amount" type="number" min="1" placeholder="Amount" />
+            <input id="address" placeholder="Shipping address" />
+          </div>
+          <div class="actions">
+            <button id="btnCreateOrder">Create Order</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>2) Danh sách Orders</h2>
+          <div class="actions">
+            <button class="secondary" id="btnRefreshOrders">Refresh Orders</button>
+          </div>
+          <ul id="ordersList" class="list"></ul>
+        </section>
+
+        <section class="card">
+          <h2>3) Danh sách Payments</h2>
+          <div class="actions">
+            <button class="secondary" id="btnRefreshPayments">Refresh Payments</button>
+          </div>
+          <ul id="paymentsList" class="list"></ul>
+        </section>
+
+        <section class="card">
+          <h2>4) Danh sách Shippings</h2>
+          <div class="actions">
+            <button class="secondary" id="btnRefreshShippings">Refresh Shippings</button>
+          </div>
+          <ul id="shippingsList" class="list"></ul>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      const messageEl = document.getElementById("message");
+      const ordersListEl = document.getElementById("ordersList");
+      const paymentsListEl = document.getElementById("paymentsList");
+      const shippingsListEl = document.getElementById("shippingsList");
+
+      let ordersCache = [];
+      let paymentsCache = [];
+      let shippingsCache = [];
+
+      function showMessage(text, type) {
+        messageEl.textContent = text;
+        messageEl.className = `msg ${type}`;
+        messageEl.style.display = "block";
+        setTimeout(() => {
+          messageEl.style.display = "none";
+        }, 2500);
+      }
+
+      async function api(path, method = "GET", body) {
+        const response = await fetch(path, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: body ? JSON.stringify(body) : undefined
+        });
+
+        let payload = null;
+        try {
+          payload = await response.json();
+        } catch (error) {
+          payload = null;
+        }
+
+        if (!response.ok) {
+          throw new Error(payload?.message || "Request failed");
+        }
+
+        return payload;
+      }
+
+      function renderOrders() {
+        ordersListEl.innerHTML = "";
+
+        if (!ordersCache.length) {
+          ordersListEl.innerHTML = "<li class='item'>Chưa có order</li>";
+          return;
+        }
+
+        ordersCache.forEach((order) => {
+          const li = document.createElement("li");
+          li.className = "item";
+
+          const payment = paymentsCache.find((p) => p.order_id === order.id);
+          const shipping = shippingsCache.find((s) => s.order_id === order.id);
+
+          li.innerHTML = `
+            <div class="item-info">
+              <div><strong>#${order.id}</strong> - ${order.customer_name} / ${order.product} / $${order.amount}</div>
+              <small>Created: ${order.created_at || "-"}</small><br />
+              <span class="status ${order.status}">${order.status}</span>
+            </div>
+            <div class="actions">
+              <button class="secondary" data-order-id="${order.id}">Xem chi tiết</button>
+            </div>
+          `;
+
+          li.querySelector("button").addEventListener("click", () => {
+            alert(
+              [
+                `Order #${order.id}`,
+                `Customer: ${order.customer_name}`,
+                `Product: ${order.product}`,
+                `Amount: ${order.amount}`,
+                `Order status: ${order.status}`,
+                `Payment: ${payment ? `#${payment.id} - ${payment.status}` : "chua tao"}`,
+                `Shipping: ${shipping ? `#${shipping.id} - ${shipping.status}` : "chua tao"}`
+              ].join("\n")
+            );
+          });
+
+          ordersListEl.appendChild(li);
+        });
+      }
+
+      function renderPayments() {
+        paymentsListEl.innerHTML = "";
+
+        if (!paymentsCache.length) {
+          paymentsListEl.innerHTML = "<li class='item'>Chưa có payment</li>";
+          return;
+        }
+
+        paymentsCache.forEach((payment) => {
+          const li = document.createElement("li");
+          li.className = "item";
+
+          li.innerHTML = `
+            <div class="item-info">
+              <div><strong>#${payment.id}</strong> - Order #${payment.order_id} - $${payment.amount}</div>
+              <small>Paid at: ${payment.paid_at || "-"}</small><br />
+              <span class="status ${payment.status}">${payment.status}</span>
+            </div>
+            <div class="actions">
+              <button ${payment.status === "paid" ? "disabled" : ""} data-payment-id="${payment.id}">
+                Confirm Payment
+              </button>
+            </div>
+          `;
+
+          li.querySelector("button").addEventListener("click", async () => {
+            try {
+              await api(`/api/payments/${payment.id}/confirm`, "PUT");
+              showMessage(`Payment #${payment.id} confirmed`, "success");
+              await refreshAll();
+            } catch (error) {
+              showMessage(error.message, "error");
+            }
+          });
+
+          paymentsListEl.appendChild(li);
+        });
+      }
+
+      function renderShippings() {
+        shippingsListEl.innerHTML = "";
+
+        if (!shippingsCache.length) {
+          shippingsListEl.innerHTML = "<li class='item'>Chưa có shipment</li>";
+          return;
+        }
+
+        shippingsCache.forEach((shipping) => {
+          const li = document.createElement("li");
+          li.className = "item";
+
+          li.innerHTML = `
+            <div class="item-info">
+              <div><strong>#${shipping.id}</strong> - Order #${shipping.order_id}</div>
+              <small>Address: ${shipping.address}</small><br />
+              <small>Shipped at: ${shipping.shipped_at || "-"}</small><br />
+              <span class="status ${shipping.status}">${shipping.status}</span>
+            </div>
+            <div class="actions">
+              <button class="danger" ${shipping.status === "shipped" ? "disabled" : ""} data-shipping-id="${shipping.id}">
+                Mark Shipped
+              </button>
+            </div>
+          `;
+
+          li.querySelector("button").addEventListener("click", async () => {
+            try {
+              await api(`/api/shippings/${shipping.id}/ship`, "PUT");
+              showMessage(`Shipping #${shipping.id} marked shipped`, "success");
+              await refreshAll();
+            } catch (error) {
+              showMessage(error.message, "error");
+            }
+          });
+
+          shippingsListEl.appendChild(li);
+        });
+      }
+
+      async function refreshAll() {
+        const [orders, payments, shippings] = await Promise.all([
+          api("/api/orders"),
+          api("/api/payments"),
+          api("/api/shippings")
+        ]);
+
+        ordersCache = orders;
+        paymentsCache = payments;
+        shippingsCache = shippings;
+
+        renderOrders();
+        renderPayments();
+        renderShippings();
+      }
+
+      document.getElementById("btnCreateOrder").addEventListener("click", async () => {
+        const customer_name = document.getElementById("customer_name").value.trim();
+        const product = document.getElementById("product").value.trim();
+        const amount = Number(document.getElementById("amount").value);
+        const address = document.getElementById("address").value.trim();
+
+        if (!customer_name || !product || !amount || !address) {
+          showMessage("Vui lòng nhập đủ customer, product, amount, address", "error");
+          return;
+        }
+
+        try {
+          await api("/api/orders", "POST", { customer_name, product, amount, address });
+          showMessage("Tạo order thành công (payment tự tạo)", "success");
+          document.getElementById("customer_name").value = "";
+          document.getElementById("product").value = "";
+          document.getElementById("amount").value = "";
+          document.getElementById("address").value = "";
+          await refreshAll();
+        } catch (error) {
+          showMessage(error.message, "error");
+        }
+      });
+
+      document.getElementById("btnRefreshOrders").addEventListener("click", refreshAll);
+      document.getElementById("btnRefreshPayments").addEventListener("click", refreshAll);
+      document.getElementById("btnRefreshShippings").addEventListener("click", refreshAll);
+
+      refreshAll().catch((error) => showMessage(error.message, "error"));
+    </script>
+  </body>
+</html>

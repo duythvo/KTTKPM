@@ -1,0 +1,90 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: orches-rabbitmq
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+
+  order-service:
+    build: ./order-service
+    container_name: orches-order-service
+    depends_on:
+      - rabbitmq
+    environment:
+      - PORT=4001
+      - SERVICE_NAME=order-service
+      - RABBIT_URL=amqp://rabbitmq:5672
+      - EXCHANGE_NAME=food.events
+    ports:
+      - "4001:4001"
+
+  orchestrator-service:
+    build: ./orchestrator-service
+    container_name: orches-orchestrator-service
+    depends_on:
+      - rabbitmq
+    environment:
+      - PORT=4000
+      - SERVICE_NAME=orchestrator-service
+      - RABBIT_URL=amqp://rabbitmq:5672
+      - EXCHANGE_NAME=food.events
+      - DELIVERY_MAX_RETRY=3
+
+  inventory-service:
+    build: ./inventory-service
+    container_name: orches-inventory-service
+    depends_on:
+      - rabbitmq
+    environment:
+      - PORT=4002
+      - SERVICE_NAME=inventory-service
+      - RABBIT_URL=amqp://rabbitmq:5672
+      - EXCHANGE_NAME=food.events
+
+  payment-service:
+    build: ./payment-service
+    container_name: orches-payment-service
+    depends_on:
+      - rabbitmq
+    environment:
+      - PORT=4003
+      - SERVICE_NAME=payment-service
+      - RABBIT_URL=amqp://rabbitmq:5672
+      - EXCHANGE_NAME=food.events
+      - PAYMENT_FAIL_RATE=${PAYMENT_FAIL_RATE:-0}
+
+  kitchen-service:
+    build: ./kitchen-service
+    container_name: orches-kitchen-service
+    depends_on:
+      - rabbitmq
+    environment:
+      - PORT=4004
+      - SERVICE_NAME=kitchen-service
+      - RABBIT_URL=amqp://rabbitmq:5672
+      - EXCHANGE_NAME=food.events
+      - KITCHEN_FAIL_RATE=${KITCHEN_FAIL_RATE:-0}
+
+  delivery-service:
+    build: ./delivery-service
+    container_name: orches-delivery-service
+    depends_on:
+      - rabbitmq
+    environment:
+      - PORT=4005
+      - SERVICE_NAME=delivery-service
+      - RABBIT_URL=amqp://rabbitmq:5672
+      - EXCHANGE_NAME=food.events
+      - DELIVERY_FAIL_RATE=${DELIVERY_FAIL_RATE:-0}
+
+  web-ui:
+    build: ../web-ui
+    container_name: food-demo-web-ui-orches
+    depends_on:
+      - order-service
+    environment:
+      - VITE_CHOREO_API=http://localhost:3001
+      - VITE_ORCH_API=http://localhost:4001
+    ports:
+      - "5174:5173"

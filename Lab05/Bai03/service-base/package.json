@@ -1,0 +1,16 @@
+{
+  "name": "service-demo",
+  "version": "1.0.0",
+  "description": "Service-Based Architecture demo with API Gateway, Order, Payment, Shipping",
+  "main": "start.js",
+  "scripts": {
+    "start": "node start.js"
+  },
+  "dependencies": {
+    "axios": "^1.8.4",
+    "better-sqlite3": "^11.8.1",
+    "concurrently": "^9.1.2",
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  }
+}

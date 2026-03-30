@@ -1,0 +1,79 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: choreo-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  order-service:
+    build: ./order-service
+    container_name: choreo-order-service
+    depends_on:
+      - rabbitmq
+    environment:
+      - PORT=3001
+      - SERVICE_NAME=order-service
+      - RABBIT_URL=amqp://rabbitmq:5672
+      - EXCHANGE_NAME=food.events
+    ports:
+      - "3001:3001"
+
+  inventory-service:
+    build: ./inventory-service
+    container_name: choreo-inventory-service
+    depends_on:
+      - rabbitmq
+    environment:
+      - PORT=3002
+      - SERVICE_NAME=inventory-service
+      - RABBIT_URL=amqp://rabbitmq:5672
+      - EXCHANGE_NAME=food.events
+
+  payment-service:
+    build: ./payment-service
+    container_name: choreo-payment-service
+    depends_on:
+      - rabbitmq
+    environment:
+      - PORT=3003
+      - SERVICE_NAME=payment-service
+      - RABBIT_URL=amqp://rabbitmq:5672
+      - EXCHANGE_NAME=food.events
+      - PAYMENT_FAIL_RATE=${PAYMENT_FAIL_RATE:-0}
+
+  kitchen-service:
+    build: ./kitchen-service
+    container_name: choreo-kitchen-service
+    depends_on:
+      - rabbitmq
+    environment:
+      - PORT=3004
+      - SERVICE_NAME=kitchen-service
+      - RABBIT_URL=amqp://rabbitmq:5672
+      - EXCHANGE_NAME=food.events
+      - KITCHEN_FAIL_RATE=${KITCHEN_FAIL_RATE:-0}
+
+  delivery-service:
+    build: ./delivery-service
+    container_name: choreo-delivery-service
+    depends_on:
+      - rabbitmq
+    environment:
+      - PORT=3005
+      - SERVICE_NAME=delivery-service
+      - RABBIT_URL=amqp://rabbitmq:5672
+      - EXCHANGE_NAME=food.events
+      - DELIVERY_FAIL_RATE=${DELIVERY_FAIL_RATE:-0}
+      - DELIVERY_MAX_RETRY=3
+
+  web-ui:
+    build: ../web-ui
+    container_name: food-demo-web-ui-choreo
+    depends_on:
+      - order-service
+    environment:
+      - VITE_CHOREO_API=http://localhost:3001
+      - VITE_ORCH_API=http://localhost:4001
+    ports:
+      - "5173:5173"
